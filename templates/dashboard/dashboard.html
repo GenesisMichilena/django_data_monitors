@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Data Monitors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .welcome-msg {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .username {
+            font-weight: 600;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .dashboard-content {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .card-1 .card-icon { background: #e3f2fd; color: #1976d2; }
+        .card-2 .card-icon { background: #f3e5f5; color: #7b1fa2; }
+        .card-3 .card-icon { background: #e8f5e9; color: #388e3c; }
+        .card-4 .card-icon { background: #fff3e0; color: #f57c00; }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .card-body {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .btn-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-card:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .welcome-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .welcome-section h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .welcome-section p {
+            font-size: 18px;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .dashboard-footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="logo">
+            <h1>📊 Data Monitors</h1>
+        </div>
+        
+        <div class="user-info">
+            <div class="welcome-msg">
+                Welcome, <span class="username">{{ user.username }}</span>
+            </div>
+            
+            <!-- Formulario de logout -->
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-logout">
+                    🚪 Logout
+                </button>
+            </form>
+        </div>
+    </header>
+    
+    <!-- Contenido principal -->
+    <main class="dashboard-content">
+        <section class="welcome-section">
+            <h2>Welcome to Your Data Analytics Dashboard</h2>
+            <p>
+                Monitor, analyze, and visualize your data in real-time. 
+                This platform provides comprehensive tools for data management, 
+                reporting, and business intelligence.
+            </p>
+            
+            <div class="features">
+                <span class="feature">📈 Real-time Analytics</span>
+                <span class="feature">🔐 Secure Data Access</span>
+                <span class="feature">📊 Custom Reports</span>
+                <span class="feature">🚀 High Performance</span>
+            </div>
+        </section>
+        
+        <div class="dashboard-grid">
+            <!-- Card 1 -->
+            <div class="card card-1">
+                <div class="card-header">
+                    <div class="card-icon">📈</div>
+                    <div class="card-title">Data Analytics</div>
+                </div>
+                <div class="card-body">
+                    Access real-time analytics and visualize your data with interactive charts and reports.
+                </div>
+                <button class="btn-card">View Analytics</button>
+            </div>
+            
+            <!-- Card 2 -->
+            <div class="card card-2">
+                <div class="card-header">
+                    <div class="card-icon">🔧</div>
+                    <div class="card-title">Data Management</div>
+                </div>
+                <div class="card-body">
+                    Upload, manage, and organize your datasets with our intuitive data management tools.
+                </div>
+                <button class="btn-card">Manage Data</button>
+            </div>
+            
+            <!-- Card 3 -->
+            <div class="card card-3">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Reports</div>
+                </div>
+                <div class="card-body">
+                    Generate comprehensive reports with customizable templates and automated scheduling.
+                </div>
+                <button class="btn-card">Generate Report</button>
+            </div>
+            
+            <!-- Card 4 -->
+            <div class="card card-4">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Settings</div>
+                </div>
+                <div class="card-body">
+                    Configure your preferences, notification settings, and user permissions.
+                </div>
+                <button class="btn-card">Go to Settings</button>
+            </div>
+        </div>
+        
+        <div class="dashboard-footer">
+            <p>Data Monitors Dashboard v1.0 • © 2024 • Secure Authentication System</p>
+            <p>User: {{ user.username }} | Last login: {{ user.last_login|date:"Y-m-d H:i" }}</p>
+        </div>
+    </main>
+    
+    <script>
+        // Efectos interactivos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación de aparición de cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            // Efecto en botones
+            const buttons = document.querySelectorAll('.btn-card, .btn-logout');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    button.style.transform = 'translateY(-2px)';
+                });
+                
+                button.addEventListener('mouseleave', () => {
+                    button.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

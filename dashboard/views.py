@@ -1,15 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-import requests
-from django.conf import settings
+from django.utils import timezone
 
+@login_required
 def index(request):
-    response = requests.get(settings.API_URL)
-    posts = response.json()
-    total_responses = len(posts)
-    
-    data = {
-        'title': "Landing Page' Dashboard",
-        'total_responses': total_responses,
+    """Vista principal del dashboard protegida por autenticación"""
+    context = {
+        'user': request.user,
     }
-    
-    return render(request, 'dashboard/index.html', data)
+    return render(request, 'dashboard/dashboard.html', context)
