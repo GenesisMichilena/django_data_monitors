@@ -11,10 +11,19 @@
         </button>
         <div class="flex justify-center flex-1 lg:mr-32">
             <div class="relative w-full max-w-xl mr-6 focus-within:text-purple-500">
-
+                <!-- Aquí puedes agregar un buscador si lo necesitas -->
             </div>
         </div>
         <ul class="flex items-center flex-shrink-0 space-x-6">
+            <!-- Mostrar nombre de usuario si está autenticado -->
+            {% if user.is_authenticated %}
+            <li class="relative">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mr-2">
+                    {{ user.username }}
+                </span>
+            </li>
+            {% endif %}
+            
             <!-- Theme toggler -->
             <li class="flex">
                 <button class="rounded-md focus:outline-none focus:shadow-outline-purple" @click="toggleTheme"
@@ -34,6 +43,7 @@
                     </template>
                 </button>
             </li>
+            
             <!-- Profile menu -->
             <li class="relative">
                 <button class="align-middle rounded-full focus:shadow-outline-purple focus:outline-none"
@@ -51,7 +61,11 @@
                         aria-label="submenu">
 
                         <li class="flex">
-                            <form class="w-full">
+                            <!-- START - Block Logout -->
+                            <!-- Método post y action para el URL (con el alias 'logout') -->
+                            <form method="post" action="{% url 'logout' %}" class="w-full">
+                                <!-- CSRF token -->
+                                {% csrf_token %}
                                 <button
                                     type="submit"
                                     class="inline-flex items-center w-full px-2 py-1 text-sm font-semibold transition-colors duration-150 rounded-md hover:bg-gray-100 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-gray-200">
@@ -70,6 +84,7 @@
                                     <span>Log out</span>
                                 </button>
                             </form>
+                            <!-- END - Block Logout -->
                         </li>
                     </ul>
                 </template>

@@ -1,0 +1,29 @@
+INSTRUCCIONES PARA RAILWAY WEB:
+===============================
+
+1. 🌐 Ve a: https://railway.app
+2. 👤 Regístrate con GitHub
+3. 🆕 Click "New Project"
+4. 🗃️  Primero: "Add Service" > "Database" > "MySQL"
+5. 🔗 Segundo: "Add Service" > "GitHub Repo" 
+6. 📁 Selecciona tu repo: django_data_monitors
+7. 🌿 Rama: guia27 o produccion
+8. ⚙️  Variables de entorno (pestaña Environment Variables):
+   -----------------------------------------
+   MYSQLDATABASE     = ${{MySQL.MYSQLDATABASE}}
+   MYSQLUSER         = ${{MySQL.MYSQLUSER}}
+   MYSQLPASSWORD     = ${{MySQL.MYSQLPASSWORD}}
+   MYSQLHOST         = ${{MySQL.MYSQLHOST}}
+   MYSQLPORT         = ${{MySQL.MYSQLPORT}}
+   DJANGO_SUPERUSER_USERNAME = admin
+   DJANGO_SUPERUSER_PASSWORD = [tu_contraseña]
+   DJANGO_SUPERUSER_EMAIL    = admin@data.com.ec
+   SECRET_KEY        = [genera: openssl rand -base64 48]
+   DEBUG             = False
+   -----------------------------------------
+9. 🛠️  Settings > Build Command: pip install -r requirements.txt
+10. 🚀 Settings > Start Command: gunicorn backend_analytics_server.wsgi
+11. 📝 Settings > Pre-deploy Step:
+    python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && python manage.py createsuperuser --noinput
+12. 🚀 Click "Deploy"
+13. 🌍 Settings > Networking > Generate Domain

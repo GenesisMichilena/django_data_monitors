@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 Forbidden - Data Monitors</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .error-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .error-code {
+            font-size: 120px;
+            font-weight: 800;
+            color: #f56565;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+        
+        .error-title {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .error-message {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .user-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .user-info li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .user-info li:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .permission-info {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .permission-info h4 {
+            color: #c53030;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .permission-item {
+            background: white;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid #fc8181;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .permission-status {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .status-yes {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-no {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        @media (max-width: 480px) {
+            .error-container {
+                padding: 30px 20px;
+            }
+            
+            .error-code {
+                font-size: 80px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">403</div>
+        <div class="error-title">Access Forbidden</div>
+        
+        <div class="error-message">
+            You don't have permission to access this page. 
+            This area requires specific authorization.
+        </div>
+        
+        <div class="user-info">
+            <h3>👤 User Information</h3>
+            <ul>
+                <li>
+                    <span>Username:</span>
+                    <strong>{{ user.username }}</strong>
+                </li>
+                <li>
+                    <span>Authentication:</span>
+                    {% if user.is_authenticated %}
+                        <span class="permission-status status-yes">Authenticated</span>
+                    {% else %}
+                        <span class="permission-status status-no">Not Authenticated</span>
+                    {% endif %}
+                </li>
+                <li>
+                    <span>User Type:</span>
+                    {% if user.is_superuser %}
+                        <span style="color: #d69e2e;">👑 Superuser</span>
+                    {% elif user.is_staff %}
+                        <span style="color: #4299e1;">👔 Staff</span>
+                    {% else %}
+                        <span style="color: #718096;">👤 Regular User</span>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+        
+        <div class="permission-info">
+            <h4>🔐 Required Permission Check</h4>
+            <div class="permission-item">
+                <div>
+                    <strong>dashboard.index_viewer</strong><br>
+                    <small>Can show to index view (function-based)</small>
+                </div>
+                <div>
+                    {% if perms.dashboard.index_viewer %}
+                        <span class="permission-status status-yes">✅ Granted</span>
+                    {% else %}
+                        <span class="permission-status status-no">❌ Denied</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if not perms.dashboard.index_viewer %}
+            <div style="margin-top: 15px; padding: 10px; background: #fff5f5; border-radius: 6px;">
+                <p style="margin: 0; font-size: 14px; color: #742a2a;">
+                    <strong>Note:</strong> Contact your administrator to request the 
+                    <code>dashboard.index_viewer</code> permission.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="btn-container">
+            <a href="{% url 'login' %}" class="btn btn-primary">
+                🔐 Switch User
+            </a>
+            <a href="/admin/" class="btn btn-secondary">
+                ⚙️ Admin Panel
+            </a>
+            <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">
+                    🚪 Logout
+                </button>
+            </form>
+            <a href="/" class="btn btn-secondary">
+                🏠 Try Again
+            </a>
+        </div>
+        
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 14px; color: #718096;">
+            <p>Data Monitors System • Authorization Error • User: {{ user.username }}</p>
+        </div>
+    </div>
+</body>
+</html>

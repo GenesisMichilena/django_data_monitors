@@ -1,15 +1,18 @@
+from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
-import requests
-from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
+@login_required
+@permission_required('dashboard.index_viewer', raise_exception=True)
 def index(request):
-    response = requests.get(settings.API_URL)
-    posts = response.json()
-    total_responses = len(posts)
-    
-    data = {
-        'title': "Landing Page' Dashboard",
-        'total_responses': total_responses,
+    """Vista principal del dashboard protegida por autenticación Y permisos"""
+    context = {
+        'user': request.user,
+        'permissions': list(request.user.get_all_permissions()),
+        'has_index_permission': request.user.has_perm('dashboard.index_viewer'),
     }
-    
-    return render(request, 'dashboard/index.html', data)
+    return render(request, 'dashboard/dashboard.html', context)
+
+def custom_permission_denied(request, exception=None):
+    """Vista personalizada para errores 403 - GUÍA 26"""
+    return render(request, '403.html', {'user': request.user}, status=403)
