@@ -32,6 +32,8 @@ ALLOWED_HOSTS = [
     '.up.railway.app',      # Dominio de Railway
     'localhost',
     '127.0.0.1',
+    '.app.github.dev',
+
 ]
 
 # GUÍA 27: CSRF trusted origins para Railway
@@ -150,7 +152,7 @@ USE_TZ = True
 # GUÍA 27: ARCHIVOS ESTÁTICOS con WhiteNoise
 # ============================================================================
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Directorios donde buscar archivos estáticos
 STATICFILES_DIRS = [
