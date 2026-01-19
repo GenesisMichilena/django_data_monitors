@@ -1,10 +1,14 @@
 """
 Django settings for backend_analytics_server project.
-CONFIGURACIÓN COMPLETA: Guías 24, 25, 26 + 27 (Producción SIN MySQL)
+Configuración FINAL para Railway con SQLite
 """
 
 import os
 from pathlib import Path
+
+# ============================================================================
+# CONFIGURACIÓN BÁSICA
+# ============================================================================
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,27 +18,35 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ============================================================================
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# En producción, usa variables de entorno
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-8tz3uj(=jjys+@b-pkv^$-q+_2y4h0)6pkpwj=u45m3n%nv^uc')
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 
+    'django-insecure-clave-temporal-solo-para-desarrollo-no-usar-en-produccion'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# GUÍA 27: DEBUG debe ser False en producción
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# GUÍA 27: Hosts permitidos para Railway Y CODESPACES
-ALLOWED_HOSTS = [
-    '.up.railway.app',      # Dominio de Railway
-    '*.app.github.dev',     # CODESPACES - AGREGADO
-    '*.github.dev',         # CODESPACES - AGREGADO
-    'localhost',
-    '127.0.0.1',
-]
+# GUÍA 27: Hosts permitidos para Railway Y Codespaces
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS', 
+    '.up.railway.app,localhost,127.0.0.1'
+).split(',')
 
-# GUÍA 27: CSRF trusted origins para Railway Y CODESPACES
+# Si estamos en Codespaces, añadimos los hosts de GitHub
+if 'CODESPACE_NAME' in os.environ:
+    codespace_name = os.environ.get('CODESPACE_NAME')
+    ALLOWED_HOSTS.extend([
+        f'{codespace_name}-8000.app.github.dev',
+        f'{codespace_name}-8000.preview.app.github.dev',
+        '*.app.github.dev',
+        '*.github.dev'
+    ])
+
+# GUÍA 27: CSRF trusted origins para Railway y Codespaces
 CSRF_TRUSTED_ORIGINS = [
-    "https://*.up.railway.app",  # Dominio de Railway
-    "https://*.app.github.dev",  # Para desarrollo en Codespaces
-    "https://*.github.dev",      # Para desarrollo en Codespaces - AGREGADO
+    "https://*.up.railway.app",
+    "https://*.app.github.dev",
+    "https://*.github.dev",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
@@ -50,14 +62,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'whitenoise.runserver_nostatic',  # IMPORTANTE: Agregar esto - GUÍA 27
+    'whitenoise.runserver_nostatic',  # IMPORTANTE para desarrollo con WhiteNoise
     'dashboard',  # Tu aplicación dashboard
 ]
 
 # GUÍA 27: Middleware con WhiteNoise para archivos estáticos
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← GUÍA 27: Para servir archivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← GUÍA 27
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,7 +83,7 @@ ROOT_URLCONF = 'backend_analytics_server.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Carpeta templates raíz
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -87,10 +99,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend_analytics_server.wsgi.application'
 
 # ============================================================================
-# GUÍA 27: BASE DE DATOS - SOLO SQLite (como has estado trabajando)
+# GUÍA 27: BASE DE DATOS - SOLO SQLite (sin MySQL)
 # ============================================================================
 
-# ELIMINAMOS PyMySQL y MySQL, SOLO SQLite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -124,8 +135,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # ============================================================================
 
-LANGUAGE_CODE = 'es-ec'  # Cambiado a español Ecuador
-TIME_ZONE = 'America/Guayaquil'  # Cambiado a tu zona horaria
+LANGUAGE_CODE = 'es-ec'  # Español Ecuador
+TIME_ZONE = 'America/Guayaquil'  # Tu zona horaria
 USE_I18N = True
 USE_TZ = True
 
@@ -137,11 +148,11 @@ STATIC_URL = 'static/'
 
 # Directorios donde buscar archivos estáticos
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # Carpeta static raíz
+    BASE_DIR / 'static',
 ]
 
-# ¡¡¡CORRECCIÓN IMPORTANTE!!! Debe ser 'assets', no 'staticfiles'
-STATIC_ROOT = BASE_DIR / 'assets'  # ← CAMBIADO: 'assets' en lugar de 'staticfiles'
+# ¡IMPORTANTE! Debe ser 'assets' para Railway
+STATIC_ROOT = BASE_DIR / 'assets'
 
 # GUÍA 27: Almacenamiento de archivos estáticos comprimidos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -157,39 +168,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CONFIGURACIÓN DE AUTENTICACIÓN - GUÍAS 25-26
 # ============================================================================
 
-LOGIN_URL = '/login/'           # Fallo: acceso sin autenticación - GUÍA 25
-LOGIN_REDIRECT_URL = '/'        # Éxito: luego de autenticación exitosa - GUÍA 25
-LOGOUT_REDIRECT_URL = '/login/' # Después de logout - GUÍA 25
+LOGIN_URL = '/login/'           # GUÍA 25: Fallo - acceso sin autenticación
+LOGIN_REDIRECT_URL = '/'        # GUÍA 25: Éxito - luego de autenticación exitosa
+LOGOUT_REDIRECT_URL = '/login/' # GUÍA 25: Después de logout
 
 # Handler para error 403 personalizado - GUÍA 26
 handler403 = 'dashboard.views.custom_permission_denied'
 
 # ============================================================================
-# CONFIGURACIÓN DE SEGURIDAD ADICIONAL PARA PRODUCCIÓN - GUÍA 27 CORREGIDA
+# CONFIGURACIÓN DE SEGURIDAD ADICIONAL PARA PRODUCCIÓN - GUÍA 27
 # ============================================================================
 
-# Configuraciones de seguridad que SIEMPRE aplican
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Configuraciones que SIEMPRE aplican
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Configuraciones que solo aplican en producción (Railway)
 if not DEBUG:
-    # Seguridad HTTPS
     SECURE_SSL_REDIRECT = True
-    
-    # Cookies seguras
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    
-    # HSTS (HTTP Strict Transport Security)
     SECURE_HSTS_SECONDS = 31536000  # 1 año
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
 # ============================================================================
-# CONFIGURACIÓN DE LOGGING PARA PRODUCCIÓN - SIMPLIFICADA
+# CONFIGURACIÓN DE LOGGING
 # ============================================================================
 
 LOGGING = {
@@ -197,7 +203,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+            'format': '{levelname} {asctime} {module}: {message}',
             'style': '{',
         },
     },
@@ -217,7 +223,7 @@ LOGGING = {
 # CONFIGURACIÓN PARA RAILWAY - Variables de entorno específicas - GUÍA 27
 # ============================================================================
 
-# Variables de entorno para superusuario automático - GUÍA 27
+# Variables de entorno para superusuario automático
 DJANGO_SUPERUSER_USERNAME = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
 DJANGO_SUPERUSER_PASSWORD = os.environ.get('DJANGO_SUPERUSER_PASSWORD', '')
 DJANGO_SUPERUSER_EMAIL = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@data.com.ec')
@@ -226,16 +232,14 @@ DJANGO_SUPERUSER_EMAIL = os.environ.get('DJANGO_SUPERUSER_EMAIL', 'admin@data.co
 API_URL = os.environ.get('API_URL', 'https://jsonplaceholder.typicode.com/posts')
 
 # ============================================================================
-# MENSAJE DE CONFIGURACIÓN
+# MENSAJE DE CONFIGURACIÓN AL INICIAR
 # ============================================================================
 
-print(f"{'='*60}")
-print(f"🎯 MODO: {'DESARROLLO' if DEBUG else 'PRODUCCIÓN'}")
-print(f"📊 Base de datos: {DATABASES['default']['ENGINE']}")
-print(f"👤 DEBUG: {DEBUG}")
+print("=" * 60)
+print(f"🚀 DJANGO INICIADO - MODO: {'DESARROLLO' if DEBUG else 'PRODUCCIÓN'}")
+print(f"📊 Base de datos: SQLite")
+print(f"🔐 DEBUG: {DEBUG}")
 print(f"🌐 Hosts permitidos: {ALLOWED_HOSTS}")
-if not DEBUG:
-    print("🔐 Seguridad HTTPS: ACTIVADA")
-print(f"📦 Archivos estáticos en: {STATIC_ROOT}")
-print(f"🔑 Superusuario: {DJANGO_SUPERUSER_USERNAME}")
-print(f"{'='*60}")
+print(f"📦 Archivos estáticos: WhiteNoise ACTIVADO")
+print(f"👤 Superusuario: {DJANGO_SUPERUSER_USERNAME}")
+print("=" * 60)
