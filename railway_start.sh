@@ -8,6 +8,7 @@ python -c "import os; k=['MYSQL_URL','MYSQLDATABASE','MYSQLUSER','MYSQLPASSWORD'
 python manage.py migrate --noinput
 
 python manage.py collectstatic --noinput --verbosity 2
+ls -la staticfiles/assets/css || true
 ls -la staticfiles | head -n 50
 
 
