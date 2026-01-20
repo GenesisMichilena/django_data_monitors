@@ -5,6 +5,7 @@ Configuración para despliegue en Railway - Guía 27
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 import pymysql
 
 pymysql.install_as_MySQLdb()
@@ -14,6 +15,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 def env_bool(key: str, default: str = "False") -> bool:
     return os.getenv(key, default).strip().lower() in ("1", "true", "yes", "on")
+
+
+def first_env(*keys):
+    for k in keys:
+        v = os.getenv(k)
+        if v:
+            return v
+    return None
 
 
 DEBUG = env_bool("DEBUG", "False")
@@ -96,26 +105,45 @@ if USE_SQLITE or DEBUG:
         }
     }
 else:
-    required = ["MYSQLDATABASE", "MYSQLUSER", "MYSQLPASSWORD", "MYSQLHOST", "MYSQLPORT"]
-    missing = [k for k in required if not os.getenv(k)]
-    if missing:
-        raise RuntimeError(f"Missing DB env vars: {missing}")
-
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": os.environ["MYSQLDATABASE"],
-            "USER": os.environ["MYSQLUSER"],
-            "PASSWORD": os.environ["MYSQLPASSWORD"],
-            "HOST": os.environ["MYSQLHOST"],
-            "PORT": os.environ["MYSQLPORT"],
-            "OPTIONS": {
-                "charset": "utf8mb4",
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            },
-            "CONN_MAX_AGE": 60,
+    db_url = first_env("MYSQL_URL", "DATABASE_URL")
+    if db_url:
+        u = urlparse(db_url)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": (u.path or "").lstrip("/"),
+                "USER": u.username or "",
+                "PASSWORD": u.password or "",
+                "HOST": u.hostname or "",
+                "PORT": str(u.port or 3306),
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                },
+                "CONN_MAX_AGE": 60,
+            }
         }
-    }
+    else:
+        required = ["MYSQLDATABASE", "MYSQLUSER", "MYSQLPASSWORD", "MYSQLHOST", "MYSQLPORT"]
+        missing = [k for k in required if not os.getenv(k)]
+        if missing:
+            raise RuntimeError(f"Missing DB env vars: {missing}")
+
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": os.environ["MYSQLDATABASE"],
+                "USER": os.environ["MYSQLUSER"],
+                "PASSWORD": os.environ["MYSQLPASSWORD"],
+                "HOST": os.environ["MYSQLHOST"],
+                "PORT": os.environ["MYSQLPORT"],
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                },
+                "CONN_MAX_AGE": 60,
+            }
+        }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
