@@ -5,7 +5,7 @@ Configuración para despliegue en Railway - Guía 27
 
 import os
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 import pymysql
 
 pymysql.install_as_MySQLdb()
@@ -108,10 +108,16 @@ else:
     db_url = first_env("MYSQL_URL", "DATABASE_URL")
     if db_url:
         u = urlparse(db_url)
+        db_name = (u.path or "").lstrip("/") or None
+        if not db_name:
+            q = parse_qs(u.query or "")
+            db_name = (q.get("database") or q.get("db") or q.get("dbname") or [None])[0]
+        db_name = db_name or os.getenv("MYSQLDATABASE") or "railway"
+
         DATABASES = {
             "default": {
                 "ENGINE": "django.db.backends.mysql",
-                "NAME": (u.path or "").lstrip("/"),
+                "NAME": db_name,
                 "USER": u.username or "",
                 "PASSWORD": u.password or "",
                 "HOST": u.hostname or "",
@@ -151,6 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {"min_length": 8},
     },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]

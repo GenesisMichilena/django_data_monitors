@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+python -c "import os; from urllib.parse import urlparse; u=urlparse(os.getenv('MYSQL_URL','')); print('MYSQL_URL path:', u.path)"
+
 python -c "import os; k=['MYSQL_URL','MYSQLDATABASE','MYSQLUSER','MYSQLPASSWORD','MYSQLHOST','MYSQLPORT']; print({i: ('present' if os.getenv(i) else 'missing') for i in k})"
 
 python manage.py migrate --noinput
