@@ -27,7 +27,7 @@ Thumbs.db
 
 # Static files collected (pueden regenerarse)
 staticfiles/
-assets/
+
 
 # Media files (subidos por usuarios)
 media/
